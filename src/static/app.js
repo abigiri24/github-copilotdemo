@@ -41,6 +41,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function loadActivities() {
+    const res = await fetch('/activities');
+    const activities = await res.json();
+    const list = document.getElementById('activities-list');
+    list.innerHTML = '';
+    Object.entries(activities).forEach(([name, info]) => {
+      const card = document.createElement('div');
+      card.className = 'activity-card';
+      card.innerHTML = `
+        <h4>${name}</h4>
+        <p><strong>Description:</strong> ${info.description}</p>
+        <p><strong>Schedule:</strong> ${info.schedule}</p>
+        <p><strong>Max Participants:</strong> ${info.max_participants}</p>
+        <div class="participants-section">
+          <strong>Participants:</strong>
+          <ul class="participants-list">
+            ${info.participants && info.participants.length === 0
+              ? '<li><em>No participants yet</em></li>'
+              : (info.participants || []).map(email => `<li>${email}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
   // Handle form submission
   signupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -83,4 +109,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize app
   fetchActivities();
+  loadActivities();
 });
